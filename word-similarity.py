@@ -12,8 +12,8 @@ def read_file(path):
 
 def length_vecto(vector):
 	power = 0
-	for dic in vector:
-		power = power + math.pow(dic.values()[0],2)
+	for dic in vector.values():
+		power = power + math.pow(dic,2)
 	return math.sqrt(power)
 	
 def cos_sim(vector_a, vector_b):
@@ -21,11 +21,11 @@ def cos_sim(vector_a, vector_b):
 	length_vecto_b = length_vecto(vector_b)
 	
 	total = 0
-	for dict1 in min(vector_a,vector_b):
-		for dict2 in max(vector_a,vector_b):
-			if dict1.keys()[0] in dict2:
-				total = total + (dict1.values()[0] * dict2.values()[0])
-		
+	keys_a = vector_a.keys()
+	keys_b = vector_b.keys()
+	for word in min(keys_a,keys_b):
+		if word in keys_a and word in keys_b:
+			total = total + (vector_a.get(word) * vector_b.get(word))
 	return total / (length_vecto_a * length_vecto_b)
 	
 def number_of_term(word, document):
@@ -51,8 +51,8 @@ def tfidf(tf,idf):
 	return tf * idf
 
 if __name__ == "__main__":
-	document_a = read_file("./test.txt")
-	document_b = read_file("./test2.txt")
+	document_a = read_file("./putin.txt")
+	document_b = read_file("./putin2.txt")
 	print document_a
 	print document_b
 	list_document = [document_a, document_b]
@@ -65,9 +65,9 @@ if __name__ == "__main__":
 	#print idf
 	#print "tf-idf:", tfidf(tf,idf)
 	#print "cosine:", cos_sim([1,2,3],[4,5,6])
-	vector_a = []
-	vector_b = []
-	idf_dict = []
+	vector_a = {}
+	vector_b = {}
+	idf_dict = {}
 	words = []
 	
 	for word in document_a:
@@ -94,28 +94,29 @@ if __name__ == "__main__":
 	print words
 	for word in words:
 		idf_value = idf(word, list_document)
-		idf_dict.append({word:idf_value})
+		idf_dict[word] = idf_value
 	
 	print idf_dict
 	
 	print "**************************"
 	for word in document_a:
-		for dic in idf_dict:
-			if word in dic:
-				tf_value = tf(word, document_a)
-				idf_value = dic.get(word)
-				vector_a.append({word:tfidf(tf_value, idf_value)})
-				break
+		if word in idf_dict:
+			tf_value = tf(word, document_a)
+			idf_value = idf_dict.get(word)
+			vector_a[word] = tfidf(tf_value, idf_value)
+			
 			
 		#print word, " ", tf_value, idf_value, tfidf(tf_value, idf_value)
 	print "**************************"
-	for word in document_b:
-		for dic in idf_dict:
-			if word in dic:
-				tf_value = tf(word, document_b)
-				idf_value = dic.get(word)
-				vector_b.append({word:tfidf(tf_value, idf_value)})
-				break
+	for word in document_b:	
+		#print "word1:", word
+		if word in idf_dict:
+			#print "word:", word
+			tf_value = tf(word, document_b)
+			idf_value = idf_dict.get(word)
+			vector_b[word] = tfidf(tf_value, idf_value)
+			#print "vector_b:", vector_b
+			
 		
 		#print word, " ", tf_value, idf_value, tfidf(tf_value, idf_value)
 			
